@@ -1,0 +1,122 @@
+@extends('layouts.app2')
+
+@section('content')
+<style>
+    /* Mengatur tombol ikon mata agar seragam */
+    .input-group .btn-outline-secondary {
+        border-color: #FDB813; /* Warna border default */
+        background-color: #717880;
+        color: #ffffff; /* Warna ikon default */
+        transition: all 0.3s ease; /* Transisi halus saat di-hover */
+    }
+
+    /* Efek saat tombol di-hover */
+    .input-group .btn-outline-secondary:hover {
+        background-color: #6c757d; /* Warna background abu-abu saat hover */
+        border-color: #6c757d;    /* Border ikut abu-abu */
+        color: #FDB813;          /* Warna ikon mata jadi emas (#FDB813) */
+    }
+
+    /* Opsional: Efek saat tombol diklik atau fokus */
+    .input-group .btn-outline-secondary:focus {
+        box-shadow: 0 0 0 0.25rem rgba(253, 184, 19, 0.25); /* Glow emas tipis */
+        border-color: #FDB813;
+    }
+</style>
+<head>
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+ 
+</head>
+<style>
+    .full-height-container { min-height: 85vh; display: flex; align-items: center; justify-content: center; }
+    .bg-cititrans { background: linear-gradient(135deg, #FDB813 0%, #FFA500 100%); border-bottom: 2px solid #333; }
+</style>
+
+<div class="container full-height-container">
+    <div class="row justify-content-center w-100">
+        <div class="col-11 col-sm-8 col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-cititrans text-dark fw-bold text-center">{{ __('Pengaturan Profil') }}</div>
+                <div class="card-body p-4">
+                    
+                    {{-- Foto Profil --}}
+                    <div class="text-center mb-4">
+                        <img src="{{ auth()->user()->photo && file_exists(public_path('storage/photos/' . auth()->user()->photo)) 
+                                   ? asset('storage/photos/' . auth()->user()->photo) 
+                                   : asset('assets/img/icons/15.png') }}" 
+                             class="rounded-circle img-thumbnail shadow-sm" 
+                             style="width: 120px; height: 120px; object-fit: cover;">
+                    </div>
+
+                    <form action="{{ route('profile.indexU') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PATCH')
+
+                        {{-- Update Foto --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ __('Foto Profil Baru') }}</label>
+                            <input type="file" name="photo" class="form-control">
+                        </div>
+
+                        {{-- Update Username --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ __('Username') }}</label>
+                            <input type="text" name="name" class="form-control" value="{{ old('name', auth()->user()->name) }}" required>
+                        </div>
+
+                        {{-- Password Lama dengan Toggle --}}
+                     <div class="mb-3">
+                    <label class="form-label fw-bold">{{ __('Password Lama') }}</label>
+                    <div class="input-group">
+                        <input type="password" name="current_password" id="current_password" 
+                            class="form-control @error('current_password') is-invalid @enderror" 
+                            placeholder="{{ __('Masukkan password lama') }}">
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('current_password')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        {{-- Menampilkan pesan error jika password salah --}}
+                        @error('current_password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                        {{-- Password Baru dengan Toggle --}}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">{{ __('Password Baru') }}</label>
+                            <div class="input-group">
+                                <input type="password" name="password" id="new_password" class="form-control" placeholder="********">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('new_password')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Tombol Simpan --}}
+                        <button type="submit" class="btn w-100 fw-bold shadow-sm" 
+                                style="background-color: #FDB813; color: #000; border: none; padding: 10px;">
+                            {{ __('Simpan Semua Perubahan') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = input.nextElementSibling.querySelector('i');
+    
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+        input.type = "password";
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+}
+</script>
+@endsection
